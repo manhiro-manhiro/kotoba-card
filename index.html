@@ -120,13 +120,13 @@ body{background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--f
 
 <script>
 const CARDS=[
-  {genre:'映画',q:'You talking to me?',trans:'おれに話しかけてるのか？',source:'タクシードライバー',meta:'Martin Scorsese, 1976 / Robert De Niro',context:'トラヴィス・ビックルが鏡に向かって独り言を言うシーン。即興で生まれたとされ、アメリカ映画史上最も引用された台詞の一つ。'},
-  {genre:'映画',q:'Get busy living, or get busy dying.',trans:'必死に生きるか、必死に死ぬかだ。',source:'ショーシャンクの空に',meta:'Frank Darabont, 1994 / Tim Robbins',context:'アンディがレッドに送った手紙の一節。生きることへの意志を端的に言い表した言葉。'},
-  {genre:'映画',q:'I\'m gonna make him an offer he can\'t refuse.',trans:'断れない条件を出してやる。',source:'ゴッドファーザー',meta:'Francis Ford Coppola, 1972 / Marlon Brando',context:'ドン・コルレオーネが静かに、しかし絶対的な力を帯びて語る一言。恐怖と礼節が同居している。'},
-  {genre:'映画',q:'We accept the love we think we deserve.',trans:'人は自分が値すると思う愛しか受け入れない。',source:'ウォールフラワー',meta:'Stephen Chbosky, 2012 / Paul Rudd',context:'チャーリーに向けてアンダーソン先生が言う一言。自己価値と愛の関係を鋭くとらえている。'},
-  {genre:'映画',q:'Life is like a box of chocolates. You never know what you\'re gonna get.',trans:'人生はチョコレートの箱。開けてみるまで中身はわからない。',source:'フォレスト・ガンプ',meta:'Robert Zemeckis, 1994 / Tom Hanks',context:'母から受け継いだ言葉をフォレストが語るシーン。人生の予測不可能性と受容を語る。'},
-  {genre:'映画',q:'To infinity and beyond.',trans:'無限の彼方へ、さあ行くぞ。',source:'トイ・ストーリー',meta:'John Lasseter, 1995 / Tim Allen',context:'バズ・ライトイヤーの口癖。限界を超えようとする意志と夢想の無限性を子供の言葉で表現している。'},
-  {genre:'映画',q:'You can\'t handle the truth.',trans:'お前に真実は受け止められん。',source:'ア・フュー・グッドメン',meta:'Rob Reiner, 1992 / Jack Nicholson',context:'真実を問い詰められたジェサップ大佐が法廷で放つ一言。権力と真実の衝突を象徴する。'},
+  {genre:'映画',q:'You talking to me?',trans:'おれに話しかけてるのか？',source:'タクシードライバー',meta:'Martin Scorsese, 1976 / トラヴィス・ビックル（Robert De Niro）',context:'トラヴィス・ビックルが鏡に向かって独り言を言うシーン。即興で生まれたとされ、アメリカ映画史上最も引用された台詞の一つ。'},
+  {genre:'映画',q:'Get busy living, or get busy dying.',trans:'必死に生きるか、必死に死ぬかだ。',source:'ショーシャンクの空に',meta:'Frank Darabont, 1994 / アンディ・デュフレーン（Tim Robbins）',context:'アンディがレッドに送った手紙の一節。生きることへの意志を端的に言い表した言葉。'},
+  {genre:'映画',q:'I\'m gonna make him an offer he can\'t refuse.',trans:'断れない条件を出してやる。',source:'ゴッドファーザー',meta:'Francis Ford Coppola, 1972 / ドン・コルレオーネ（Marlon Brando）',context:'ドン・コルレオーネが静かに、しかし絶対的な力を帯びて語る一言。恐怖と礼節が同居している。'},
+  {genre:'映画',q:'We accept the love we think we deserve.',trans:'人は自分が値すると思う愛しか受け入れない。',source:'ウォールフラワー',meta:'Stephen Chbosky, 2012 / アンダーソン先生（Paul Rudd）',context:'チャーリーに向けてアンダーソン先生が言う一言。自己価値と愛の関係を鋭くとらえている。'},
+  {genre:'映画',q:'Life is like a box of chocolates. You never know what you\'re gonna get.',trans:'人生はチョコレートの箱。開けてみるまで中身はわからない。',source:'フォレスト・ガンプ',meta:'Robert Zemeckis, 1994 / フォレスト・ガンプ（Tom Hanks）',context:'母から受け継いだ言葉をフォレストが語るシーン。人生の予測不可能性と受容を語る。'},
+  {genre:'映画',q:'To infinity and beyond.',trans:'無限の彼方へ、さあ行くぞ。',source:'トイ・ストーリー',meta:'John Lasseter, 1995 / バズ・ライトイヤー（Tim Allen）',context:'バズ・ライトイヤーの口癖。限界を超えようとする意志と夢想の無限性を子供の言葉で表現している。'},
+  {genre:'映画',q:'You can\'t handle the truth.',trans:'お前に真実は受け止められん。',source:'ア・フュー・グッドメン',meta:'Rob Reiner, 1992 / ジェサップ大佐（Jack Nicholson）',context:'真実を問い詰められたジェサップ大佐が法廷で放つ一言。権力と真実の衝突を象徴する。'},
   {genre:'哲学',q:'我思う、ゆえに我あり。',trans:'',source:'デカルト',meta:'ルネ・デカルト『方法序説』1637年',context:'あらゆる疑いを排した後に残る唯一確実な命題。近代哲学の出発点とされる。'},
   {genre:'哲学',q:'神は死んだ。',trans:'',source:'ニーチェ',meta:'フリードリヒ・ニーチェ『悦ばしき知識』1882年',context:'近代における宗教的・道徳的権威の崩壊を宣言した言葉。ニヒリズムの出発点として読まれることが多い。'},
   {genre:'哲学',q:'他者は地獄だ。',trans:'',source:'サルトル',meta:'ジャン＝ポール・サルトル『出口なし』1944年',context:'密室に閉じ込められた登場人物ガルサンが絞り出す言葉。他者の眼差しによる存在の固定化を指す。'},
