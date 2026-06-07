@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>言葉のカード — Kotoba Card</title>
+<title>KOTOBA</title>
 <style>
 :root{
   --bg-primary:#ffffff;--bg-secondary:#f5f4ef;--bg-tertiary:#eceae2;
@@ -67,7 +67,7 @@ body{background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--f
 </head>
 <body>
 <div class="app">
-  <div class="app-title">言葉のカード</div>
+  <div class="app-title">KOTOBA</div>
   <div class="genre-bar" id="genre-bar"></div>
 
   <div class="scene" id="scene">
@@ -469,7 +469,7 @@ function shareCard(){
   // ブランド
   ctx.font='10px -apple-system,BlinkMacSystemFont,sans-serif';
   ctx.fillStyle=isDark?'#555450':'#c0beb8';
-  ctx.fillText('言葉のカード / kotoba-card-six.vercel.app',W/2,H-22);
+  ctx.fillText('KOTOBA / kotoba-card-six.vercel.app',W/2,H-22);
 
   canvas.toBlob(function(blob){
     const shareText=card.q+'\n— '+card.source+'\n\nhttps://kotoba-card-six.vercel.app';
