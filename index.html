@@ -418,7 +418,11 @@ let used=[],favs=[],showFavs=false,isFlipped=false,activeGenre='all';
 let history=[],hIndex=-1,suppressClick=false;
 
 function save(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify({favs,activeGenre}));}catch(e){}}
-function load(){try{const r=localStorage.getItem(STORAGE_KEY);if(r){const d=JSON.parse(r);favs=d.favs||[];activeGenre=d.activeGenre||'all';}}catch(e){}}
+function load(){try{const r=localStorage.getItem(STORAGE_KEY);if(r){const d=JSON.parse(r);favs=d.favs||[];activeGenre=d.activeGenre||'all';
+// 保存されたジャンル名が現在のジャンルに存在しない場合はallにリセット
+const validGenres=['all'].concat([...new Set(CARDS.map(c=>c.genre))]);
+if(!validGenres.includes(activeGenre)){activeGenre='all';}
+}}catch(e){}}
 
 function filteredCards(){return activeGenre==='all'?CARDS:CARDS.filter(c=>c.genre===activeGenre);}
 function pickNew(){
