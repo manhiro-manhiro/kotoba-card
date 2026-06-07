@@ -102,6 +102,7 @@ body{background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--f
       <button class="ibtn" id="prev-btn" onclick="prevCard()">&larr; 前へ</button>
       <button class="ibtn" onclick="nextCard()">次へ &rarr;</button>
       <button class="ibtn" id="fav-btn" onclick="toggleFav()">お気に入り</button>
+      <button class="ibtn" onclick="shareCard()">シェア</button>
     </div>
     <div style="display:flex;gap:10px;align-items:center">
       <span class="counter" id="counter"></span>
@@ -417,6 +418,73 @@ function initSwipe(){
   scene.addEventListener('mousedown',function(e){mdown=true;start(e.clientX,e.clientY);});
   window.addEventListener('mousemove',function(e){if(mdown)move(e.clientX,e.clientY);});
   window.addEventListener('mouseup',function(){if(mdown){mdown=false;end();}});
+}
+
+function shareCard(){
+  const card=current();
+  if(!card)return;
+  const col=GENRE_COLORS[card.genre]||'#908f88';
+  const W=640,H=400,DPR=2;
+  const canvas=document.createElement('canvas');
+  canvas.width=W*DPR;canvas.height=H*DPR;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(DPR,DPR);
+
+  const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.fillStyle=isDark?'#1f1e1c':'#ffffff';
+  ctx.beginPath();
+  ctx.roundRect(0,0,W,H,16);
+  ctx.fill();
+
+  // ジャンルバッジ
+  ctx.font='500 11px -apple-system,BlinkMacSystemFont,sans-serif';
+  ctx.fillStyle=col;
+  ctx.textAlign='center';
+  ctx.fillText(card.genre.toUpperCase(),W/2,56);
+
+  // 引用テキスト（折り返し）
+  const fontSize=card.q.length>40?18:22;
+  ctx.font=fontSize+'px Georgia,serif';
+  ctx.fillStyle=isDark?'#f0efe9':'#1a1a18';
+  const maxW=W-120;
+  const lineH=fontSize*1.75;
+  const chars=card.q.split('');
+  const lines=[];
+  let line='';
+  for(let i=0;i<chars.length;i++){
+    const test=line+chars[i];
+    if(ctx.measureText(test).width>maxW&&line!==''){lines.push(line);line=chars[i];}
+    else{line=test;}
+  }
+  if(line)lines.push(line);
+  const totalH=lines.length*lineH;
+  const startY=(H-totalH)/2;
+  lines.forEach(function(l,i){ctx.fillText(l,W/2,startY+i*lineH+fontSize*0.8);});
+
+  // 出典
+  ctx.font='12px -apple-system,BlinkMacSystemFont,sans-serif';
+  ctx.fillStyle=isDark?'#888780':'#908f88';
+  ctx.fillText('— '+card.source,W/2,H-44);
+
+  // ブランド
+  ctx.font='10px -apple-system,BlinkMacSystemFont,sans-serif';
+  ctx.fillStyle=isDark?'#555450':'#c0beb8';
+  ctx.fillText('言葉のカード / kotoba-card-six.vercel.app',W/2,H-22);
+
+  canvas.toBlob(function(blob){
+    const shareText=card.q+'\n— '+card.source+'\n\nhttps://kotoba-card-six.vercel.app';
+    const file=new File([blob],'kotoba-card.png',{type:'image/png'});
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
+      navigator.share({title:'言葉のカード',text:shareText,files:[file]}).catch(function(){});
+    }else if(navigator.share){
+      navigator.share({title:'言葉のカード',text:shareText}).catch(function(){});
+    }else{
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='kotoba-card.png';
+      a.click();
+    }
+  },'image/png');
 }
 
 function init(){
