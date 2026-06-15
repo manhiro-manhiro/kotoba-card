@@ -106,7 +106,8 @@ body{background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--f
       <button class="ibtn" id="prev-btn" onclick="prevCard()">&larr; 前へ</button>
       <button class="ibtn" onclick="nextCard()">次へ &rarr;</button>
       <button class="ibtn" id="fav-btn" onclick="toggleFav()">お気に入り</button>
-      <button class="ibtn" onclick="shareCard()">シェア</button>
+      <button class="ibtn" onclick="shareCard('front')">表をシェア</button>
+      <button class="ibtn" onclick="shareCard('both')">表裏シェア</button>
     </div>
     <div style="display:flex;gap:10px;align-items:center">
       <span class="counter" id="counter"></span>
@@ -573,37 +574,24 @@ function initSwipe(){
   window.addEventListener('mouseup',function(){if(mdown){mdown=false;end();}});
 }
 
-function shareCard(){
-  const card=current();
-  if(!card)return;
+function makeFrontCanvas(card){
   const col=GENRE_COLORS[card.genre]||'#908f88';
   const W=640,H=400,DPR=2;
   const canvas=document.createElement('canvas');
   canvas.width=W*DPR;canvas.height=H*DPR;
   const ctx=canvas.getContext('2d');
   ctx.scale(DPR,DPR);
-
   const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
   ctx.fillStyle=isDark?'#1f1e1c':'#ffffff';
-  ctx.beginPath();
-  ctx.roundRect(0,0,W,H,16);
-  ctx.fill();
-
-  // ジャンルバッジ
+  ctx.beginPath();ctx.roundRect(0,0,W,H,16);ctx.fill();
   ctx.font='500 11px -apple-system,BlinkMacSystemFont,sans-serif';
-  ctx.fillStyle=col;
-  ctx.textAlign='center';
+  ctx.fillStyle=col;ctx.textAlign='center';
   ctx.fillText(card.genre.toUpperCase(),W/2,56);
-
-  // 引用テキスト（折り返し）
   const fontSize=card.q.length>40?18:22;
   ctx.font=fontSize+'px Georgia,serif';
   ctx.fillStyle=isDark?'#f0efe9':'#1a1a18';
-  const maxW=W-120;
-  const lineH=fontSize*1.75;
-  const chars=card.q.split('');
-  const lines=[];
-  let line='';
+  const maxW=W-120,lineH=fontSize*1.75;
+  const chars=card.q.split('');const lines=[];let line='';
   for(let i=0;i<chars.length;i++){
     const test=line+chars[i];
     if(ctx.measureText(test).width>maxW&&line!==''){lines.push(line);line=chars[i];}
@@ -613,19 +601,135 @@ function shareCard(){
   const totalH=lines.length*lineH;
   const startY=(H-totalH)/2;
   lines.forEach(function(l,i){ctx.fillText(l,W/2,startY+i*lineH+fontSize*0.8);});
-
-  // 出典
   ctx.font='12px -apple-system,BlinkMacSystemFont,sans-serif';
   ctx.fillStyle=isDark?'#888780':'#908f88';
   ctx.fillText('— '+card.source,W/2,H-44);
-
-  // ブランド
   ctx.font='10px -apple-system,BlinkMacSystemFont,sans-serif';
   ctx.fillStyle=isDark?'#555450':'#c0beb8';
   ctx.fillText('KOTOBA / kotoba-card-six.vercel.app',W/2,H-22);
+  return canvas;
+}
 
-  canvas.toBlob(function(blob){
-    const shareText=card.q+'\n— '+card.source+'\n\nhttps://kotoba-card-six.vercel.app';
+function makeBackCanvas(card){
+  const col=GENRE_COLORS[card.genre]||'#908f88';
+  const W=640,H=400,DPR=2;
+  const canvas=document.createElement('canvas');
+  canvas.width=W*DPR;canvas.height=H*DPR;
+  const ctx=canvas.getContext('2d');
+  ctx.scale(DPR,DPR);
+  const isDark=window.matchMedia('(prefers-color-scheme:dark)').matches;
+  const bg=isDark?'#1f1e1c':'#ffffff';
+  const textMain=isDark?'#f0efe9':'#1a1a18';
+  const textSub=isDark?'#b4b2a9':'#5f5e5a';
+  const textTer=isDark?'#888780':'#908f88';
+  const lineCol=isDark?'rgba(255,255,255,0.12)':'rgba(0,0,0,0.12)';
+  ctx.fillStyle=bg;
+  ctx.beginPath();ctx.roundRect(0,0,W,H,16);ctx.fill();
+  let y=40;
+  // ジャンル
+  ctx.font='500 10px -apple-system,sans-serif';
+  ctx.fillStyle=col;ctx.textAlign='left';
+  ctx.fillText(card.genre.toUpperCase(),40,y);y+=22;
+  // 出典タイトル
+  ctx.font='600 16px -apple-system,sans-serif';
+  ctx.fillStyle=textMain;
+  ctx.fillText(card.source,40,y);y+=20;
+  // meta
+  ctx.font='12px -apple-system,sans-serif';
+  ctx.fillStyle=textSub;
+  const metaLines=wrapText(ctx,card.meta,W-80,12);
+  metaLines.forEach(function(l){ctx.fillText(l,40,y);y+=18;});
+  // 邦訳
+  if(card.trans&&card.trans.trim()){
+    y+=10;
+    ctx.strokeStyle=lineCol;ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-40,y);ctx.stroke();
+    y+=16;
+    ctx.font='500 10px -apple-system,sans-serif';ctx.fillStyle=textTer;
+    ctx.fillText('邦訳',40,y);y+=16;
+    ctx.font='14px Georgia,serif';ctx.fillStyle=textMain;
+    const tLines=wrapText(ctx,card.trans,W-80,14);
+    tLines.forEach(function(l){ctx.fillText(l,40,y);y+=22;});
+  }
+  // 英訳
+  if(card.eng&&card.eng.trim()){
+    y+=6;
+    ctx.strokeStyle=lineCol;ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-40,y);ctx.stroke();
+    y+=16;
+    ctx.font='500 10px -apple-system,sans-serif';ctx.fillStyle=textTer;
+    ctx.fillText('ENGLISH',40,y);y+=16;
+    ctx.font='13px Georgia,serif';ctx.fillStyle=textMain;
+    const eLines=wrapText(ctx,card.eng,W-80,13);
+    eLines.forEach(function(l){ctx.fillText(l,40,y);y+=20;});
+  }
+  // 背景（残りスペースがあれば）
+  if(y<H-60&&card.context){
+    y+=8;
+    ctx.strokeStyle=lineCol;ctx.lineWidth=0.5;
+    ctx.beginPath();ctx.moveTo(40,y);ctx.lineTo(W-40,y);ctx.stroke();
+    y+=16;
+    ctx.font='500 10px -apple-system,sans-serif';ctx.fillStyle=textTer;
+    ctx.fillText('背景',40,y);y+=16;
+    ctx.font='12px -apple-system,sans-serif';ctx.fillStyle=textSub;
+    const cLines=wrapText(ctx,card.context,W-80,12);
+    let drawn=0;
+    for(let i=0;i<cLines.length;i++){
+      if(y+16>H-30)break;
+      ctx.fillText(cLines[i],40,y);y+=18;drawn++;
+    }
+    if(drawn<cLines.length){
+      ctx.fillText('…',40,y);
+    }
+  }
+  // ブランド
+  ctx.font='10px -apple-system,sans-serif';
+  ctx.fillStyle=textTer;ctx.textAlign='center';
+  ctx.fillText('KOTOBA / kotoba-card-six.vercel.app',W/2,H-16);
+  return canvas;
+}
+
+function wrapText(ctx,text,maxW,fontSize){
+  const lines=[];
+  const paras=text.split('\n');
+  paras.forEach(function(para){
+    const chars=para.split('');
+    let line='';
+    for(let i=0;i<chars.length;i++){
+      const test=line+chars[i];
+      if(ctx.measureText(test).width>maxW&&line!==''){lines.push(line);line=chars[i];}
+      else{line=test;}
+    }
+    if(line)lines.push(line);
+  });
+  return lines;
+}
+
+function canvasToBlob(canvas){
+  return new Promise(function(resolve){canvas.toBlob(resolve,'image/png');});
+}
+
+async function shareCard(mode){
+  const card=current();
+  if(!card)return;
+  const shareText=card.q+'\n— '+card.source+'\n\nhttps://kotoba-card-six.vercel.app';
+  if(mode==='both'){
+    const frontBlob=await canvasToBlob(makeFrontCanvas(card));
+    const backBlob=await canvasToBlob(makeBackCanvas(card));
+    const files=[
+      new File([frontBlob],'kotoba-front.png',{type:'image/png'}),
+      new File([backBlob],'kotoba-back.png',{type:'image/png'})
+    ];
+    if(navigator.share&&navigator.canShare&&navigator.canShare({files})){
+      navigator.share({title:'言葉のカード',text:shareText,files}).catch(function(){});
+    }else{
+      // 2枚対応していない場合は表のみ
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(frontBlob);
+      a.download='kotoba-front.png';a.click();
+    }
+  }else{
+    const blob=await canvasToBlob(makeFrontCanvas(card));
     const file=new File([blob],'kotoba-card.png',{type:'image/png'});
     if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){
       navigator.share({title:'言葉のカード',text:shareText,files:[file]}).catch(function(){});
@@ -634,10 +738,9 @@ function shareCard(){
     }else{
       const a=document.createElement('a');
       a.href=URL.createObjectURL(blob);
-      a.download='kotoba-card.png';
-      a.click();
+      a.download='kotoba-card.png';a.click();
     }
-  },'image/png');
+  }
 }
 
 function init(){
