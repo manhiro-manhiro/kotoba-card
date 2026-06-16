@@ -464,9 +464,24 @@ function renderCard(card){
   if(card.eng&&card.eng.trim()){eb.style.display='block';document.getElementById('b-eng').textContent=card.eng;}
   else{eb.style.display='none';}
   document.getElementById('b-context').textContent=card.context;
-  // Amazonリンク生成
-  const keyword=encodeURIComponent(card.source);
-  document.getElementById('amazon-link').href='https://www.amazon.co.jp/s?k='+keyword+'&tag=manhiro0823-22';
+  // Amazonリンク生成（ジャンル別キーワード最適化）
+  const src=card.source;
+  const genreKeywords={
+    '映画':src+' Blu-ray',
+    '文学':src+' 文庫',
+    '哲学':src+' 文庫',
+    'シェイクスピア':'シェイクスピア '+src,
+    'ゲーテ':'ゲーテ '+src,
+    '孔子':'孔子 論語',
+    '三国志':src+' 三国志',
+    'HIPHOP':src+' CD',
+    '音楽':src+' CD',
+    '現代短歌':src+' 歌集',
+    '人物':src,
+    '現代アート':src,
+  };
+  const kw=genreKeywords[card.genre]||src;
+  document.getElementById('amazon-link').href='https://www.amazon.co.jp/s?k='+encodeURIComponent(kw)+'&tag=manhiro0823-22';
   updateFavBtn();updateCounter();updateNav();
 }
 
