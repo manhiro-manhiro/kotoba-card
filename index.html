@@ -94,6 +94,11 @@ body{background:var(--bg-tertiary);color:var(--text-primary);font-family:var(--f
             <div class="context-label">背景</div>
             <div class="context-text" id="b-context"></div>
           </div>
+          <div style="margin-top:16px;padding-top:14px;border-top:0.5px solid var(--border-tertiary)">
+            <a id="amazon-link" href="" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--text-tertiary);text-decoration:none;padding:6px 12px;border-radius:20px;border:0.5px solid var(--border-tertiary)">
+              <span>🛒</span><span>Amazonで探す</span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
@@ -459,6 +464,9 @@ function renderCard(card){
   if(card.eng&&card.eng.trim()){eb.style.display='block';document.getElementById('b-eng').textContent=card.eng;}
   else{eb.style.display='none';}
   document.getElementById('b-context').textContent=card.context;
+  // Amazonリンク生成
+  const keyword=encodeURIComponent(card.source);
+  document.getElementById('amazon-link').href='https://www.amazon.co.jp/s?k='+keyword+'&tag=manhiro0823-22';
   updateFavBtn();updateCounter();updateNav();
 }
 
